@@ -25,7 +25,7 @@
       }
     },
     comercio2: {
-      password: '1234',
+      password: '9876',
       nombre: 'Comercio 2',
       comercio: 'Comercio 2',
       grupos: {
