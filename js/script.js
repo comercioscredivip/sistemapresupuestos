@@ -25,7 +25,7 @@
       }
     },
     comercio2: {
-      password: '9876',
+      password: '1234',
       nombre: 'Comercio 2',
       comercio: 'Comercio 2',
       grupos: {
@@ -102,16 +102,14 @@
       document.getElementById('sidebar').classList.toggle('open');
     });
 
-    // --- PRESUPUESTO FORM (CrediVip Simulator) ---
+    // --- PRESUPUESTO FORM (Unificado) ---
     var presupForm = document.getElementById('presupuestoForm');
     if (presupForm) {
       var subTitle = document.querySelector('.sub-title');
       var gruposActivos = userData.grupos;
 
-      // Mostrar el comercio del usuario
       if (subTitle) subTitle.textContent = userData.comercio;
 
-      // Si es admin, mostrar selector de comercio
       var comercioGroup = document.getElementById('comercioGroup');
       var comercioSelect = document.getElementById('comercioSelect');
       if (username === 'admin') {
@@ -130,52 +128,57 @@
 
         var monto = parseFloat(document.getElementById('monto').value);
         if (isNaN(monto) || monto <= 0) {
-          alert('Ingrese un monto válido');
+          alert('Ingrese un monto válido.');
           return;
         }
 
         var anio = document.getElementById('anio').value;
         var grupo = gruposActivos[anio];
         var html = '';
+        var idx = 0;
         for (var c in grupo) {
           var valor = (monto * grupo[c]) / 100;
-          html += '<tr><td>' + c + '</td><td>$ ' + valor.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + '</td></tr>';
+          var checked = idx === 0 ? 'checked' : '';
+          html += '<tr><td><input type="radio" name="cuota-radio" class="cuota-check" data-cuota="' + c + '" data-valor="' + valor.toFixed(2) + '" ' + checked + '></td><td>' + c + '</td><td>$ ' + valor.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + '</td></tr>';
+          idx++;
         }
         document.getElementById('resultado').innerHTML = html;
+        actualizarWaLink();
+      });
 
-        var select = document.getElementById('anio');
-        var textoAnio = select.options[select.selectedIndex].text;
-        var texto = 'Hola, quiero solicitar un crédito.%0A%0AAño: ' + textoAnio + '%0AMonto: $ ' + monto.toLocaleString('es-AR');
-        document.getElementById('waLink').href = 'https://wa.me/5493625328026?text=' + texto;
+      document.getElementById('resultado').addEventListener('change', function (e) {
+        if (e.target && e.target.classList.contains('cuota-check')) {
+          actualizarWaLink();
+        }
       });
     }
 
-    // --- FORMULARIO FORM ---
-    var formularioForm = document.getElementById('formularioForm');
-    if (formularioForm) {
-      formularioForm.addEventListener('submit', function (e) {
-        e.preventDefault();
+    function actualizarWaLink() {
+      var select = document.getElementById('anio');
+      var textoAnio = select.options[select.selectedIndex].text;
+      var monto = parseFloat(document.getElementById('monto').value);
+      if (isNaN(monto) || monto <= 0) return;
 
-        var dni = document.getElementById('formDni').value.trim();
-        var nombre = document.getElementById('formNombre').value.trim();
-        var monto = parseFloat(document.getElementById('formMonto').value);
-        var plan = document.getElementById('formPlan').value;
-        var cuotas = document.getElementById('formCuotas').value;
+      var dni = document.getElementById('formDni').value.trim();
+      var nombre = document.getElementById('formNombre').value.trim();
+      var telefono = document.getElementById('formTelefono').value.trim();
 
-        if (!dni || !nombre || isNaN(monto) || monto <= 0) {
-          alert('Complete todos los campos correctamente.');
-          return;
-        }
+      var checked = document.querySelector('.cuota-check:checked');
+      if (!checked) {
+        document.getElementById('waLink').removeAttribute('href');
+        return;
+      }
+      var cuotaText = checked.getAttribute('data-cuota') + ' ($ ' + parseFloat(checked.getAttribute('data-valor')).toLocaleString('es-AR', { maximumFractionDigits: 0 }) + ')';
 
-        var texto = 'Hola, quiero solicitar un crédito.%0A%0A' +
-                    'DNI: ' + dni + '%0A' +
-                    'Nombre: ' + nombre + '%0A' +
-                    'Monto: $ ' + monto.toLocaleString('es-AR') + '%0A' +
-                    'Plan: ' + plan + '%0A' +
-                    'Cuotas: ' + cuotas;
+      var texto = 'Hola, quiero solicitar un crédito.%0A%0A';
+      if (dni) texto += 'DNI: ' + dni + '%0A';
+      if (nombre) texto += 'Nombre: ' + nombre + '%0A';
+      if (telefono) texto += 'Teléfono: ' + telefono + '%0A';
+      texto += 'Monto del crédito: $ ' + monto.toLocaleString('es-AR') + '%0A' +
+               'Plan: ' + textoAnio + '%0A' +
+               'Cuotas: ' + cuotaText;
 
-        window.open('https://wa.me/5493625328026?text=' + texto, '_blank');
-      });
+      document.getElementById('waLink').href = 'https://wa.me/5493625328026?text=' + texto;
     }
 
     // logout
