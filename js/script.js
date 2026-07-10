@@ -25,7 +25,7 @@
       }
     },
     comercio2: {
-      password: '1234',
+      password: '9876',
       nombre: 'Comercio 2',
       comercio: 'Comercio 2',
       grupos: {
@@ -150,6 +150,12 @@
         if (e.target && e.target.classList.contains('cuota-check')) {
           actualizarWaLink();
         }
+      });
+
+      ['formDni', 'formNombre', 'formTelefono'].forEach(function (id) {
+        document.getElementById(id).addEventListener('input', function () {
+          actualizarWaLink();
+        });
       });
     }
 
