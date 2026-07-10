@@ -20,24 +20,6 @@
               Presupuesto
             </button>
           </li>
-          <li>
-            <button class="nav-btn" data-section="formulario">
-              <span class="nav-icon">&#128221;</span>
-              Formulario
-            </button>
-          </li>
-          <li>
-            <button class="nav-btn" data-section="historial" disabled style="opacity:0.5;">
-              <span class="nav-icon">&#128214;</span>
-              Historial
-            </button>
-          </li>
-          <li>
-            <button class="nav-btn" data-section="config" disabled style="opacity:0.5;">
-              <span class="nav-icon">&#9881;</span>
-              Configuración
-            </button>
-          </li>
         </ul>
       </nav>
       <div class="sidebar-footer">
@@ -59,86 +41,61 @@
           </div>
           <div class="card-body">
             <h3 class="sub-title">Comercio 1</h3>
+            <div class="form-group admin-only" id="comercioGroup" style="display:none;">
+              <label for="comercioSelect">Comercio</label>
+              <select id="comercioSelect">
+                <option value="comercio1">Comercio 1</option>
+                <option value="comercio2">Comercio 2</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
             <form id="presupuestoForm">
-              <div class="form-group admin-only" id="comercioGroup" style="display:none;">
-                <label for="comercioSelect">Comercio</label>
-                <select id="comercioSelect">
-                  <option value="comercio1">Comercio 1</option>
-                  <option value="comercio2">Comercio 2</option>
-                  <option value="admin">Administrador</option>
-                </select>
+              <div class="form-group">
+                <label for="monto">Monto del crédito</label>
+                <input type="number" id="monto" placeholder="Ingrese el monto" required>
               </div>
               <div class="form-group">
-                <label for="anio">Año</label>
+                <label for="anio">Plan (Año)</label>
                 <select id="anio">
                   <option value="g1">Año 2006 a 2010</option>
                   <option value="g2">Año 2011 a 2015</option>
                   <option value="g3">Año 2016 a 2026</option>
                 </select>
               </div>
-              <div class="form-group">
-                <label for="monto">Monto del crédito</label>
-                <input type="number" id="monto" placeholder="Ingrese el monto">
-              </div>
               <button type="submit" class="btn btn-primary btn-lg">Calcular</button>
             </form>
             <hr class="divider">
             <h2 class="section-title">Presupuesto</h2>
+            <p class="select-cuotas-hint">Seleccione las cuotas deseadas:</p>
             <div class="table-wrapper">
               <table class="simul-table">
-                <thead><tr><th>Cuotas</th><th>Valor de la cuota</th></tr></thead>
+                <thead><tr><th>Seleccionar</th><th>Cuotas</th><th>Valor de la cuota</th></tr></thead>
                 <tbody id="resultado"></tbody>
               </table>
-          </div>
-        </div>
-      </section>
-      <section id="section-formulario" class="content-section">
-        <div class="card">
-          <div class="card-header">
-            <h3>Formulario de solicitud</h3>
-          </div>
-          <div class="card-body">
-            <form id="formularioForm">
-              <div class="form-group">
-                <label for="formDni">DNI</label>
-                <input type="text" id="formDni" placeholder="Número de DNI" required>
-              </div>
-              <div class="form-group">
-                <label for="formNombre">Nombre completo</label>
-                <input type="text" id="formNombre" placeholder="Nombre y apellido" required>
-              </div>
-              <div class="form-group">
-                <label for="formMonto">Monto del crédito</label>
-                <input type="number" id="formMonto" placeholder="Ingrese el monto" required>
+            </div>
+            <div class="datos-adicionales">
+              <h3 class="datos-title">Datos del solicitante (opcional)</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="formDni">DNI</label>
+                  <input type="text" id="formDni" placeholder="Número de DNI">
+                </div>
+                <div class="form-group">
+                  <label for="formNombre">Nombre completo</label>
+                  <input type="text" id="formNombre" placeholder="Nombre y apellido">
+                </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="formPlan">Plan</label>
-                  <select id="formPlan">
-                    <option value="2006-2010">2006 a 2010</option>
-                    <option value="2011-2015">2011 a 2015</option>
-                    <option value="2016-2026">2016 a 2026</option>
-                  </select>
+                  <label for="formTelefono">Teléfono</label>
+                  <input type="text" id="formTelefono" placeholder="Número de teléfono">
                 </div>
-                <div class="form-group">
-                  <label for="formCuotas">Cuotas</label>
-                  <select id="formCuotas">
-                    <option value="12">12 cuotas</option>
-                    <option value="18">18 cuotas</option>
-                    <option value="24">24 cuotas</option>
-                  </select>
-                </div>
+                <div class="form-group"></div>
               </div>
-              <button type="submit" class="btn btn-wa btn-lg">Enviar por WhatsApp</button>
-            </form>
+            </div>
+            <a id="waLink" class="btn btn-wa" target="_blank">Solicitar crédito por WhatsApp</a>
           </div>
         </div>
-      </section>
-      <section id="section-historial" class="content-section">
-        <p>Sección en desarrollo...</p>
-      </section>
-      <section id="section-config" class="content-section">
-        <p>Sección en desarrollo...</p>
       </section>
     </main>
   </div>
