@@ -364,6 +364,39 @@ select:focus {
   background: #f8f9fa;
 }
 
+.simul-table th:first-child {
+  width: 60px;
+}
+
+.simul-table input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #1a73e8;
+}
+
+.datos-adicionales {
+  margin-top: 20px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.datos-title {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.select-cuotas-hint {
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
 .info-box {
   margin-top: 25px;
   background: #eef6ff;
