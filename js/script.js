@@ -9,9 +9,9 @@
       nombre: 'Admin',
       comercio: 'Administrador',
       grupos: {
-        g1: { 6: 26.50000, 12: 13.78580, 18: 11.117700, 24: 9.919100 },
-        g2: { 6: 23.50000, 12: 13.75590, 18: 11.007337, 24: 9.829675 },
-        g3: { 6: 23.00000, 12: 12.15970, 18: 9.45570, 24: 8.18050 }
+        g1: { Cuota fija 6: 26.50000, Cuota fija 12: 13.78580, Cuota fija 18: 11.117700, Cuota fija 24: 9.919100, Cuota UVA 36: 5.20000},
+        g2: { Cuota fija 6: 23.50000, Cuota fija 12: 13.75590, Cuota fija 18: 11.007337, Cuota fija 24: 9.829675, Cuota UVA 36: 4.90000 },
+        g3: { Cuota fija 6: 23.00000, Cuota fija 12: 12.15970, Cuota fija 18: 9.45570, Cuota fija 24: 8.18050, Cuota UVA 36: 4.50000 },
       }
     },
     comercio1: {
@@ -19,9 +19,9 @@
       nombre: 'Comercio 1',
       comercio: 'Comercio 1',
       grupos: {
-        g1: { 6: 26.50000, 12: 13.78580, 18: 11.117700, 24: 9.919100 },
-        g2: { 6: 23.50000, 12: 13.75590, 18: 11.007337, 24: 9.829675 },
-        g3: { 6: 23.00000, 12: 12.15970, 18: 9.45570, 24: 8.18050 }
+        g1: { Cuota fija 6: 26.50000, Cuota fija 12: 13.78580, Cuota fija 18: 11.117700, Cuota fija 24: 9.919100, Cuota UVA 36: 5.20000 },
+        g2: { Cuota fija 6: 23.50000, Cuota fija 12: 13.75590, Cuota fija 18: 11.007337, Cuota fija 24: 9.829675, Cuota UVA 36: 4.90000 },
+        g3: { Cuota fija 6: 23.00000, Cuota fija 12: 12.15970, Cuota fija 18: 9.45570, Cuota fija 24: 8.18050, Cuota UVA 36: 4.50000 }
       }
     },
     comercio2: {
@@ -29,9 +29,9 @@
       nombre: 'Comercio 2',
       comercio: 'Comercio 2',
       grupos: {
-        g1: { 6: 23.67000, 12: 15.32000, 18: 12.65457, 24: 11.45000 },
-        g2: { 6: 23.50000, 12: 13.75590, 18: 11.18366, 24: 10.04181 },
-        g3: { 6: 22.60000, 12: 12.68250, 18: 10.31098, 24: 8.76620 }
+        g1: { Cuota fija 6: 23.67000, Cuota fija 12: 15.32000, Cuota fija 18: 12.65457, Cuota fija 24: 11.45000, Cuota UVA 36: 5.00000 },
+        g2: { Cuota fija 6: 23.50000, Cuota fija 12: 13.75590, Cuota fija 18: 11.18366, Cuota fija 24: 10.04181, Cuota UVA 36: 5.00000 },
+        g3: { Cuota fija 6: 22.60000, Cuota fija 12: 12.68250, Cuota fija 18: 10.31098, Cuota fija 24: 8.76620, Cuota UVA 36: 5.00000 }
       }
     }
   };
