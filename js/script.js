@@ -1,6 +1,41 @@
 (function () {
   'use strict';
 
+  // ===== ALMACENAMIENTO SEGURO (fallback en memoria) =====
+  // Si localStorage está bloqueado (incógnito, navegadores integrados, etc.)
+  // no falla la aplicación.
+  var memStore = {};
+  var storageOk = (function () {
+    try {
+      localStorage.setItem('__test__', '1');
+      localStorage.removeItem('__test__');
+      return true;
+    } catch (e) {
+      return false;
+    }
+  })();
+
+  function getStore(key) {
+    if (storageOk) {
+      try { return localStorage.getItem(key); } catch (e) { storageOk = false; }
+    }
+    return key in memStore ? memStore[key] : null;
+  }
+
+  function setStore(key, value) {
+    if (storageOk) {
+      try { localStorage.setItem(key, value); return; } catch (e) { storageOk = false; }
+    }
+    memStore[key] = value;
+  }
+
+  function removeStore(key) {
+    if (storageOk) {
+      try { localStorage.removeItem(key); return; } catch (e) { storageOk = false; }
+    }
+    delete memStore[key];
+  }
+
   // ===== BASE DE DATOS DE USUARIOS =====
   // Cada usuario tiene su propio juego de coeficientes
   var usuarios = {
@@ -52,8 +87,8 @@
 
       var userData = usuarios[username];
       if (userData && userData.password === password) {
-        localStorage.setItem('loggedUser', username);
-        localStorage.setItem('userData', JSON.stringify(userData));
+        setStore('loggedUser', username);
+        setStore('userData', JSON.stringify(userData));
         window.location.href = 'dashboard.html';
       } else {
         errorEl.textContent = 'Usuario o contraseña incorrectos.';
@@ -64,8 +99,13 @@
   // --- DASHBOARD ---
   var isDashboard = window.location.pathname.indexOf('dashboard.html') !== -1;
   if (isDashboard) {
-    var username = localStorage.getItem('loggedUser');
-    var userData = JSON.parse(localStorage.getItem('userData'));
+    var username = getStore('loggedUser');
+    var userData = null;
+    try {
+      userData = JSON.parse(getStore('userData'));
+    } catch (e) {
+      userData = null;
+    }
     if (!username || !userData) {
       window.location.href = 'index.html';
       return;
@@ -190,12 +230,9 @@
 
     // logout
     document.getElementById('logoutBtn').addEventListener('click', function () {
-      localStorage.removeItem('loggedUser');
-      localStorage.removeItem('userData');
+      removeStore('loggedUser');
+      removeStore('userData');
       window.location.href = 'index.html';
     });
-  }
-})();
-
   }
 })();
