@@ -139,7 +139,8 @@
         for (var c in grupo) {
           var valor = (monto * grupo[c]) / 100;
           var checked = idx === 0 ? 'checked' : '';
-          html += '<tr><td><input type="radio" name="cuota-radio" class="cuota-check" data-cuota="' + c + '" data-valor="' + valor.toFixed(2) + '" ' + checked + '></td><td>' + c + '</td><td>$ ' + valor.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + '</td></tr>';
+          var tipoPlan = c == 36 ? 'Cuota UVA' : 'Cuota fija';
+          html += '<tr><td><input type="radio" name="cuota-radio" class="cuota-check" data-cuota="' + c + '" data-valor="' + valor.toFixed(2) + '" ' + checked + '></td><td>' + tipoPlan + '</td><td>' + c + '</td><td>$ ' + valor.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + '</td></tr>';
           idx++;
         }
         document.getElementById('resultado').innerHTML = html;
@@ -193,5 +194,8 @@
       localStorage.removeItem('userData');
       window.location.href = 'index.html';
     });
+  }
+})();
+
   }
 })();
