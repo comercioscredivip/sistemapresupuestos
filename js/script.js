@@ -44,7 +44,7 @@
       nombre: 'Admin',
       comercio: 'Administrador',
       grupos: {
-        g1: { 6: 23.50000, 12: 13.78580, 18: 11.117700, 24: 9.919100, 36: 5.20000},
+        g1: { 6: 26.50000, 12: 13.78580, 18: 11.117700, 24: 9.919100, 36: 5.20000},
         g2: { 6: 23.50000, 12: 13.75590, 18: 11.007337, 24: 9.829675, 36: 4.90000 },
         g3: { 6: 23.00000, 12: 12.15970, 18: 9.45570, 24: 8.18050, 36: 4.50000 },
       }
@@ -54,7 +54,7 @@
       nombre: 'Comercio 1',
       comercio: 'Comercio 1',
       grupos: {
-        g1: { 6: 23.50000, 12: 13.78580, 18: 11.117700, 24: 9.919100, 36: 5.20000 },
+        g1: { 6: 26.50000, 12: 13.78580, 18: 11.117700, 24: 9.919100, 36: 5.20000 },
         g2: { 6: 23.50000, 12: 13.75590, 18: 11.007337, 24: 9.829675, 36: 4.90000 },
         g3: { 6: 23.00000, 12: 12.15970, 18: 9.45570, 24: 8.18050, 36: 4.50000 }
       }
@@ -143,10 +143,30 @@
     });
 
     // --- PRESUPUESTO FORM (Unificado) ---
+    function parseMonto(str) {
+      if (!str) return NaN;
+      var soloDigitos = String(str).replace(/\D/g, '');
+      if (!soloDigitos) return NaN;
+      return parseFloat(soloDigitos);
+    }
+
     var presupForm = document.getElementById('presupuestoForm');
     if (presupForm) {
       var subTitle = document.querySelector('.sub-title');
       var gruposActivos = userData.grupos;
+
+      // Miles con puntos: 1500000 -> 1.500.000
+      var montoInput = document.getElementById('monto');
+      montoInput.addEventListener('input', function () {
+        var num = parseMonto(montoInput.value);
+        if (isNaN(num)) {
+          montoInput.value = '';
+        } else {
+          var formateado = num.toLocaleString('es-AR', { maximumFractionDigits: 0 });
+          if (montoInput.value !== formateado) montoInput.value = formateado;
+        }
+        actualizarWaLink();
+      });
 
       if (subTitle) subTitle.textContent = userData.comercio;
 
@@ -166,7 +186,7 @@
       presupForm.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        var monto = parseFloat(document.getElementById('monto').value);
+        var monto = parseMonto(document.getElementById('monto').value);
         if (isNaN(monto) || monto <= 0) {
           alert('Ingrese un monto válido.');
           return;
@@ -193,7 +213,7 @@
         }
       });
 
-      ['formDni', 'formNombre', 'formTelefono'].forEach(function (id) {
+      ['formDni', 'formNombre', 'formTelefono', 'formValorOperacion'].forEach(function (id) {
         document.getElementById(id).addEventListener('input', function () {
           actualizarWaLink();
         });
@@ -203,12 +223,13 @@
     function actualizarWaLink() {
       var select = document.getElementById('anio');
       var textoAnio = select.options[select.selectedIndex].text;
-      var monto = parseFloat(document.getElementById('monto').value);
+      var monto = parseMonto(document.getElementById('monto').value);
       if (isNaN(monto) || monto <= 0) return;
 
       var dni = document.getElementById('formDni').value.trim();
       var nombre = document.getElementById('formNombre').value.trim();
       var telefono = document.getElementById('formTelefono').value.trim();
+      var valorOperacion = document.getElementById('formValorOperacion').value.trim();
 
       var checked = document.querySelector('.cuota-check:checked');
       if (!checked) {
@@ -218,10 +239,11 @@
       var cuotaText = checked.getAttribute('data-cuota') + ' ($ ' + parseFloat(checked.getAttribute('data-valor')).toLocaleString('es-AR', { maximumFractionDigits: 0 }) + ')';
 
       var texto = 'Hola, quiero solicitar un crédito.%0A%0A';
-      if (dni) texto += 'DNI: ' + dni + '%0A';
-      if (nombre) texto += 'Nombre: ' + nombre + '%0A';
-      if (telefono) texto += 'Teléfono: ' + telefono + '%0A';
-      texto += 'Monto del crédito: $ ' + monto.toLocaleString('es-AR') + '%0A' +
+      if (dni) texto += 'DNI del cliente: ' + dni + '%0A';
+      if (nombre) texto += 'DNI del co Deudor / Conyugue o Conviviente: ' + nombre + '%0A';
+      if (telefono) texto += 'Vehiculo (marca, modelo, año, dominio): ' + telefono + '%0A';
+      if (valorOperacion) texto += 'Vehiculo - Valor de la operación: ' + valorOperacion + '%0A';
+      texto += 'Monto del crédito: $ ' + monto.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + '%0A' +
                'Plan: ' + textoAnio + '%0A' +
                'Cuotas: ' + cuotaText;
 
