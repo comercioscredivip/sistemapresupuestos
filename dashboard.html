@@ -52,7 +52,7 @@
             <form id="presupuestoForm">
               <div class="form-group">
                 <label for="monto">Monto del crédito</label>
-                <input type="number" id="monto" placeholder="Ingrese el monto" required>
+                <input type="text" id="monto" inputmode="numeric" placeholder="Ej: 1.500.000" required>
               </div>
               <div class="form-group">
                 <label for="anio">Plan (Año)</label>
@@ -77,20 +77,23 @@
               <h3 class="datos-title">Datos del solicitante (opcional)</h3>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="formDni">DNI</label>
-                  <input type="text" id="formDni" placeholder="Número de DNI">
+                  <label for="formDni">DNI del cliente</label>
+                  <input type="text" id="formDni" placeholder="Número de DNI del cliente">
                 </div>
                 <div class="form-group">
-                  <label for="formNombre">Nombre completo</label>
-                  <input type="text" id="formNombre" placeholder="Nombre y apellido">
+                  <label for="formNombre">DNI del co Deudor / Conyugue o Conviviente</label>
+                  <input type="text" id="formNombre" placeholder="DNI del co deudor / conyugue o conviviente">
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="formTelefono">Teléfono</label>
-                  <input type="text" id="formTelefono" placeholder="Número de teléfono">
+                  <label for="formTelefono">Vehiculo: marca, Modelo, Año, Dominio</label>
+                  <input type="text" id="formTelefono" placeholder="Marca, modelo, año, dominio">
                 </div>
-                <div class="form-group"></div>
+                <div class="form-group">
+                  <label for="formValorOperacion">Vehiculo: Valor de la operación</label>
+                  <input type="text" id="formValorOperacion" placeholder="Valor de la operación">
+                </div>
               </div>
             </div>
             <a id="waLink" class="btn btn-wa" target="_blank">Solicitar crédito por WhatsApp</a>
