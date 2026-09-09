@@ -200,7 +200,7 @@
           var valor = (monto * grupo[c]) / 100;
           var checked = idx === 0 ? 'checked' : '';
           var tipoPlan = c == 36 ? 'Cuota UVA' : 'Cuota fija';
-          html += '<tr><td><input type="radio" name="cuota-radio" class="cuota-check" data-cuota="' + c + '" data-valor="' + valor.toFixed(2) + '" ' + checked + '></td><td>' + tipoPlan + '</td><td>' + c + '</td><td>$ ' + valor.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + '</td></tr>';
+          html += '<tr><td><input type="radio" name="cuota-radio" class="cuota-check" data-cuota="' + c + '" data-valor="' + valor.toFixed(2) + '" data-tipo="' + tipoPlan + '" ' + checked + '></td><td>' + tipoPlan + '</td><td>' + c + '</td><td>$ ' + valor.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + '</td></tr>';
           idx++;
         }
         document.getElementById('resultado').innerHTML = html;
@@ -250,16 +250,17 @@
       }
       waBtn.classList.remove('disabled');
       waBtn.removeAttribute('title');
+      var tipoPlanSel = checked.getAttribute('data-tipo') || (checked.getAttribute('data-cuota') == '36' ? 'Cuota UVA' : 'Cuota fija');
       var cuotaText = checked.getAttribute('data-cuota') + ' ($ ' + parseFloat(checked.getAttribute('data-valor')).toLocaleString('es-AR', { maximumFractionDigits: 0 }) + ')';
 
       var texto = 'Hola, quiero solicitar un crédito.%0A%0A';
       texto += 'DNI del cliente: ' + dni + '%0A';
       texto += 'DNI del co Deudor / Conyugue o Conviviente: ' + nombre + '%0A';
-      texto += 'Vehiculo (marca, modelo, año, dominio): ' + telefono + '%0A';
-      texto += 'Vehiculo - Valor de la operación: ' + valorOperacion + '%0A';
+      texto += 'Vehiculo: ' + telefono + '%0A';
+      texto += 'Valor de la operación: ' + valorOperacion + '%0A';
       texto += 'Monto del crédito: $ ' + monto.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + '%0A' +
                'Plan: ' + textoAnio + '%0A' +
-               'Cuotas: ' + cuotaText;
+               tipoPlanSel + ': ' + cuotaText;
 
       waBtn.href = 'https://wa.me/5493625328026?text=' + texto;
     }
