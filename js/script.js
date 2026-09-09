@@ -224,7 +224,11 @@
       var select = document.getElementById('anio');
       var textoAnio = select.options[select.selectedIndex].text;
       var monto = parseMonto(document.getElementById('monto').value);
-      if (isNaN(monto) || monto <= 0) return;
+      var waBtn = document.getElementById('waLink');
+      if (isNaN(monto) || monto <= 0) {
+        waBtn.removeAttribute('href');
+        return;
+      }
 
       var dni = document.getElementById('formDni').value.trim();
       var nombre = document.getElementById('formNombre').value.trim();
@@ -233,22 +237,44 @@
 
       var checked = document.querySelector('.cuota-check:checked');
       if (!checked) {
-        document.getElementById('waLink').removeAttribute('href');
+        waBtn.removeAttribute('href');
         return;
       }
+
+      // Obligatorios: DNI cliente, DNI co-deudor, Vehiculo datos, Valor operación
+      if (!dni || !nombre || !telefono || !valorOperacion) {
+        waBtn.removeAttribute('href');
+        waBtn.classList.add('disabled');
+        waBtn.setAttribute('title', 'Complete los campos obligatorios (*) para enviar la solicitud');
+        return;
+      }
+      waBtn.classList.remove('disabled');
+      waBtn.removeAttribute('title');
       var cuotaText = checked.getAttribute('data-cuota') + ' ($ ' + parseFloat(checked.getAttribute('data-valor')).toLocaleString('es-AR', { maximumFractionDigits: 0 }) + ')';
 
       var texto = 'Hola, quiero solicitar un crédito.%0A%0A';
-      if (dni) texto += 'DNI del cliente: ' + dni + '%0A';
-      if (nombre) texto += 'DNI del co Deudor / Conyugue o Conviviente: ' + nombre + '%0A';
-      if (telefono) texto += 'Vehiculo (marca, modelo, año, dominio): ' + telefono + '%0A';
-      if (valorOperacion) texto += 'Vehiculo - Valor de la operación: ' + valorOperacion + '%0A';
+      texto += 'DNI del cliente: ' + dni + '%0A';
+      texto += 'DNI del co Deudor / Conyugue o Conviviente: ' + nombre + '%0A';
+      texto += 'Vehiculo (marca, modelo, año, dominio): ' + telefono + '%0A';
+      texto += 'Vehiculo - Valor de la operación: ' + valorOperacion + '%0A';
       texto += 'Monto del crédito: $ ' + monto.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + '%0A' +
                'Plan: ' + textoAnio + '%0A' +
                'Cuotas: ' + cuotaText;
 
-      document.getElementById('waLink').href = 'https://wa.me/5493625328026?text=' + texto;
+      waBtn.href = 'https://wa.me/5493625328026?text=' + texto;
     }
+
+    // Aviso si intentan enviar sin completar obligatorios
+    document.getElementById('waLink').addEventListener('click', function (e) {
+      var dni = document.getElementById('formDni').value.trim();
+      var nombre = document.getElementById('formNombre').value.trim();
+      var telefono = document.getElementById('formTelefono').value.trim();
+      var valorOperacion = document.getElementById('formValorOperacion').value.trim();
+      if (!dni || !nombre || !telefono || !valorOperacion) {
+        e.preventDefault();
+        alert('Complete los campos obligatorios (*): DNI del cliente, DNI del co Deudor, Vehículo y Valor de la operación.');
+      }
+    });
 
     // logout
     document.getElementById('logoutBtn').addEventListener('click', function () {
