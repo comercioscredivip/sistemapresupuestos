@@ -68,8 +68,57 @@
         g2: { 6: 23.50000, 12: 13.75590, 18: 11.18366, 24: 10.04181, 36: 5.00000 },
         g3: { 6: 22.60000, 12: 12.68250, 18: 10.31098, 24: 8.76620, 36: 5.00000 }
       }
+    },
+    // comercio3: un único juego de planes, con el tipo de plan como dimensión
+    // explícita (la cuota 24 existe en "Cuota Fija" y en "Uva" con coeficientes
+    // distintos, así que no puede derivarse del número de cuota).
+    comercio3: {
+      password: '1234',
+      nombre: 'Comercio 3',
+      comercio: 'Comercio 3',
+      grupos: {
+        unico: {
+          fija: { 6: 25.7000, 12: 17.5000, 18: 14.6000, 24: 13.2000 },
+          uva: { 6: 23.1700, 12: 11.8000, 18: 12.0600, 24: 10.6700, 36: 9.2800 }
+        }
+      }
     }
   };
+
+  // ===== NORMALIZACIÓN DE PLANES =====
+  // Acepta dos formatos de grupo:
+  //   1) Clásico:      { 6: coef, 12: coef, ... }  -> el tipo de plan se deduce
+  //                    (cuota 36 = Cuota UVA, resto = Cuota fija).
+  //   2) Con tipo:     { fija: { 6: coef }, uva: { 6: coef } } -> el tipo es
+  //                    explícito, porque una misma cuota puede tener dos
+  //                    coeficientes distintos según el tipo de plan.
+  // Devuelve [{ tipo, cuota, coef }] en el orden de carga.
+  var etiquetasTipo = { fija: 'Cuota Fija', uva: 'Uva' };
+
+  function normalizarGrupo(grupo) {
+    var items = [];
+    if (!grupo) return items;
+    for (var clave in grupo) {
+      var valor = grupo[clave];
+      if (valor && typeof valor === 'object') {
+        // clave = tipo de plan ('fija'/'uva'), valor = { cuota: coeficiente }
+        for (var cuota in valor) {
+          items.push({
+            tipo: etiquetasTipo[clave] || clave,
+            cuota: cuota,
+            coef: valor[cuota]
+          });
+        }
+      } else {
+        items.push({ tipo: '', cuota: clave, coef: valor });
+      }
+    }
+    return items;
+  }
+
+  function etiquetaPlan(item) {
+    return item.tipo || (item.cuota == 36 ? 'Cuota UVA' : 'Cuota fija');
+  }
 
   // --- LOGIN ---
   var loginForm = document.getElementById('loginForm');
@@ -153,7 +202,28 @@
     var presupForm = document.getElementById('presupuestoForm');
     if (presupForm) {
       var subTitle = document.querySelector('.sub-title');
-      var gruposActivos = userData.grupos;
+      var anioGroup = document.getElementById('anioGroup');
+      var anioSelect = document.getElementById('anio');
+      var gruposActivos = null;
+      var clavesGrupo = [];
+
+      // Carga un juego de grupos y muestra/oculta el selector "Plan (Año)"
+      // según cuántos grupos tenga el usuario. comercio3, por ejemplo, tiene
+      // un único grupo con todos sus planes.
+      function aplicarGrupos(grupos) {
+        gruposActivos = grupos || {};
+        clavesGrupo = Object.keys(gruposActivos);
+        anioGroup.style.display = clavesGrupo.length > 1 ? 'block' : 'none';
+      }
+
+      // Grupo a utilizar para el cálculo. Si hay un solo grupo no se consulta
+      // el select (que además sigue cargado con las opciones g1/g2/g3).
+      function grupoActual() {
+        if (clavesGrupo.length <= 1) return clavesGrupo[0];
+        return clavesGrupo.indexOf(anioSelect.value) !== -1 ? anioSelect.value : clavesGrupo[0];
+      }
+
+      aplicarGrupos(userData.grupos);
 
       // Miles con puntos: 1500000 -> 1.500.000
       var montoInput = document.getElementById('monto');
@@ -177,7 +247,7 @@
         comercioSelect.addEventListener('change', function () {
           var key = comercioSelect.value;
           var data = usuarios[key];
-          gruposActivos = data.grupos;
+          aplicarGrupos(data.grupos);
           if (subTitle) subTitle.textContent = data.comercio;
           document.getElementById('resultado').innerHTML = '';
         });
@@ -192,16 +262,13 @@
           return;
         }
 
-        var anio = document.getElementById('anio').value;
-        var grupo = gruposActivos[anio];
+        var items = normalizarGrupo(gruposActivos[grupoActual()]);
         var html = '';
-        var idx = 0;
-        for (var c in grupo) {
-          var valor = (monto * grupo[c]) / 100;
-          var checked = idx === 0 ? 'checked' : '';
-          var tipoPlan = c == 36 ? 'Cuota UVA' : 'Cuota fija';
-          html += '<tr><td><input type="radio" name="cuota-radio" class="cuota-check" data-cuota="' + c + '" data-valor="' + valor.toFixed(2) + '" data-tipo="' + tipoPlan + '" ' + checked + '></td><td>' + tipoPlan + '</td><td>' + c + '</td><td>$ ' + valor.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + '</td></tr>';
-          idx++;
+        for (var i = 0; i < items.length; i++) {
+          var it = items[i];
+          var valor = (monto * it.coef) / 100;
+          var checked = i === 0 ? 'checked' : '';
+          html += '<tr><td><input type="radio" name="cuota-radio" class="cuota-check" data-tipo="' + it.tipo + '" data-cuota="' + it.cuota + '" data-valor="' + valor.toFixed(2) + '" ' + checked + '></td><td>' + etiquetaPlan(it) + '</td><td>' + it.cuota + '</td><td>$ ' + valor.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + '</td></tr>';
         }
         document.getElementById('resultado').innerHTML = html;
         actualizarWaLink();
@@ -220,15 +287,17 @@
       });
     }
 
+    var numerosWa = ['5493625328026', '5493625327100'];
+    var waLinks = [];
+
     function actualizarWaLink() {
       var select = document.getElementById('anio');
-      var textoAnio = select.options[select.selectedIndex].text;
+      // Si el usuario tiene un solo juego de planes no hay selector de año y
+      // la línea "Plan:" del mensaje no corresponde.
+      var haySelectorAnio = document.getElementById('anioGroup').style.display !== 'none';
+      var textoAnio = haySelectorAnio ? select.options[select.selectedIndex].text : '';
       var monto = parseMonto(document.getElementById('monto').value);
-      var waBtn = document.getElementById('waLink');
-      if (isNaN(monto) || monto <= 0) {
-        waBtn.removeAttribute('href');
-        return;
-      }
+      if (isNaN(monto) || monto <= 0) return;
 
       var dni = document.getElementById('formDni').value.trim();
       var nombre = document.getElementById('formNombre').value.trim();
@@ -237,44 +306,32 @@
 
       var checked = document.querySelector('.cuota-check:checked');
       if (!checked) {
-        waBtn.removeAttribute('href');
+        document.getElementById('waLink').removeAttribute('href');
+        waLinks = [];
         return;
       }
-
-      // Obligatorios: DNI cliente, DNI co-deudor, Vehiculo datos, Valor operación
-      if (!dni || !nombre || !telefono || !valorOperacion) {
-        waBtn.removeAttribute('href');
-        waBtn.classList.add('disabled');
-        waBtn.setAttribute('title', 'Complete los campos obligatorios (*) para enviar la solicitud');
-        return;
-      }
-      waBtn.classList.remove('disabled');
-      waBtn.removeAttribute('title');
-      var tipoPlanSel = checked.getAttribute('data-tipo') || (checked.getAttribute('data-cuota') == '36' ? 'Cuota UVA' : 'Cuota fija');
-      var cuotaText = checked.getAttribute('data-cuota') + ' ($ ' + parseFloat(checked.getAttribute('data-valor')).toLocaleString('es-AR', { maximumFractionDigits: 0 }) + ')';
+      var cuotaText = (checked.getAttribute('data-tipo') ? checked.getAttribute('data-tipo') + ' ' : '') +
+        checked.getAttribute('data-cuota') + ' ($ ' + parseFloat(checked.getAttribute('data-valor')).toLocaleString('es-AR', { maximumFractionDigits: 0 }) + ')';
 
       var texto = 'Hola, quiero solicitar un crédito.%0A%0A';
-      texto += 'DNI del cliente: ' + dni + '%0A';
-      texto += 'DNI del co Deudor / Conyugue o Conviviente: ' + nombre + '%0A';
-      texto += 'Vehiculo: ' + telefono + '%0A';
-      texto += 'Valor de la operación: ' + valorOperacion + '%0A';
+      if (dni) texto += 'DNI del cliente: ' + dni + '%0A';
+      if (nombre) texto += 'DNI del co Deudor / Conyugue o Conviviente: ' + nombre + '%0A';
+      if (telefono) texto += 'Vehiculo (marca, modelo, año, dominio): ' + telefono + '%0A';
+      if (valorOperacion) texto += 'Vehiculo - Valor de la operación: ' + valorOperacion + '%0A';
       texto += 'Monto del crédito: $ ' + monto.toLocaleString('es-AR', { maximumFractionDigits: 0 }) + '%0A' +
-               'Plan: ' + textoAnio + '%0A' +
-               tipoPlanSel + ': ' + cuotaText;
+               (textoAnio ? 'Plan: ' + textoAnio + '%0A' : '') +
+               'Cuotas: ' + cuotaText;
 
-      waBtn.href = 'https://wa.me/5493625328026?text=' + texto;
+      waLinks = numerosWa.map(function (n) { return 'https://wa.me/' + n + '?text=' + texto; });
+      document.getElementById('waLink').href = waLinks[0];
     }
 
-    // Aviso si intentan enviar sin completar obligatorios
     document.getElementById('waLink').addEventListener('click', function (e) {
-      var dni = document.getElementById('formDni').value.trim();
-      var nombre = document.getElementById('formNombre').value.trim();
-      var telefono = document.getElementById('formTelefono').value.trim();
-      var valorOperacion = document.getElementById('formValorOperacion').value.trim();
-      if (!dni || !nombre || !telefono || !valorOperacion) {
-        e.preventDefault();
-        alert('Complete los campos obligatorios (*): DNI del cliente, DNI del co Deudor, Vehículo y Valor de la operación.');
-      }
+      if (waLinks.length < 2) return;
+      e.preventDefault();
+      waLinks.forEach(function (url) {
+        window.open(url, '_blank');
+      });
     });
 
     // logout
